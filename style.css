@@ -136,6 +136,158 @@ header h1 {
     filter: brightness(0.9) saturate(1.1);
 }
 
+/* Mobile Touch Support */
+.draggable-item.selected {
+    border: 3px solid #007bff !important;
+    box-shadow: 0 0 15px rgba(0, 123, 255, 0.6) !important;
+    background-color: rgba(0, 123, 255, 0.1) !important;
+    transform: scale(1.05);
+    z-index: 200 !important;
+}
+
+.drop-zone.mobile-highlight {
+    background: rgba(0, 255, 0, 0.3) !important;
+    border: 3px solid rgba(0, 255, 0, 0.8) !important;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+    animation: pulse-zone 1.5s infinite;
+}
+
+@keyframes pulse-zone {
+    0% {
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(0, 255, 0, 0.8);
+        transform: scale(1.02);
+    }
+    100% {
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+        transform: scale(1);
+    }
+}
+
+.mobile-instruction {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1em;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    animation: bounce-instruction 2s infinite;
+    text-align: center;
+    max-width: 90%;
+}
+
+@keyframes bounce-instruction {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+    40% {
+        transform: translateX(-50%) translateY(-5px);
+    }
+    60% {
+        transform: translateX(-50%) translateY(-3px);
+    }
+}
+
+/* Touch-friendly Drop Zones */
+@media (max-width: 768px) {
+    .drop-zone {
+        min-height: 80px !important;
+        min-width: 80px !important;
+        border: 3px dashed rgba(255, 255, 255, 0.6) !important;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.2) !important;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .drop-zone:hover, .drop-zone:active {
+        background: rgba(255, 255, 255, 0.4) !important;
+        border-color: rgba(255, 255, 255, 0.8) !important;
+        transform: scale(1.05);
+    }
+
+    .draggable-item {
+        min-width: 60px;
+        min-height: 60px;
+        touch-action: manipulation;
+    }
+
+    .furniture-label {
+        font-size: 1.2em !important;
+        padding: 15px 20px !important;
+        background: rgba(0, 0, 0, 0.95) !important;
+        cursor: pointer !important;
+        border: 3px solid rgba(255, 255, 255, 0.6) !important;
+        border-radius: 12px !important;
+        transition: all 0.3s ease;
+        min-width: 120px !important;
+        min-height: 50px !important;
+        text-align: center;
+        font-weight: bold !important;
+        color: white !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-tap-highlight-color: rgba(0, 123, 255, 0.3);
+    }
+
+    .furniture-label:hover, .furniture-label:active, .furniture-label:focus {
+        background: rgba(0, 123, 255, 0.95) !important;
+        border-color: rgba(255, 255, 255, 0.9) !important;
+        transform: scale(1.08) !important;
+        box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4) !important;
+    }
+
+    .level-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .level-btn {
+        min-width: 200px;
+        padding: 18px 25px;
+        font-size: 1.1em;
+    }
+
+    .room-selection-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+
+    .room-btn {
+        padding: 20px;
+        min-height: 120px;
+    }
+}
+
+/* Responsive Font Sizes */
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.8em;
+    }
+
+    .score-board {
+        flex-direction: column;
+        gap: 10px;
+        font-size: 1em;
+    }
+
+    .mobile-instruction {
+        font-size: 0.9em;
+        padding: 10px 16px;
+        bottom: 15px;
+    }
+}
+
 .screen.active {
     display: block;
 }
@@ -677,10 +829,14 @@ header h1 {
 
 .drop-zone {
     position: absolute;
-    border: 3px dashed rgba(52, 152, 219, 0.4);
+    border: 3px dashed rgba(52, 152, 219, 0.6);
     border-radius: 12px;
     transition: all 0.3s;
-    background: rgba(116, 185, 255, 0.15);
+    background: rgba(116, 185, 255, 0.2);
+    cursor: pointer;
+    min-height: 40px;
+    min-width: 40px;
+    z-index: 10;
 }
 
 /* Möbel-Labels */
@@ -692,17 +848,40 @@ header h1 {
     pointer-events: none;
 }
 
-.furniture-label {
+.furniture-label, .furniture-button {
     position: absolute;
-    background: rgba(44, 62, 80, 0.9);
+    background: rgba(44, 62, 80, 0.95);
     color: white;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.9em;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 1.1em;
     font-weight: bold;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    border: 2px solid #ecf0f1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    border: 3px solid #ecf0f1;
+    cursor: pointer !important;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    min-height: 45px;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0, 123, 255, 0.3);
+    z-index: 999 !important;
+    pointer-events: auto !important;
+    display: block !important;
+}
+
+.furniture-button {
+    border: 3px solid #ecf0f1 !important;
+    outline: none;
+    font-family: inherit;
+}
+
+.furniture-label:hover, .furniture-label:active {
+    background: rgba(0, 123, 255, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.9);
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4);
 }
 
 .furniture-label.wardrobe-label {
@@ -927,5 +1106,19 @@ header h1 {
     .success-buttons {
         flex-direction: column;
         align-items: center;
+    }
+
+    /* Mobile Click-Bereiche - kompakt */
+    .mobile-click-area {
+        transition: all 0.2s ease;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+    }
+
+    .mobile-click-area:hover,
+    .mobile-click-area:active {
+        background: rgba(0, 255, 0, 1) !important;
+        transform: translate(-50%, -50%) scale(1.1);
     }
 }

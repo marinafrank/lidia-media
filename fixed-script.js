@@ -9,6 +9,8 @@ class AufraumSpiel {
         this.activeElement = null;
         this.currentLevel = 1; // Standard Level
         this.maxLevel = 3;
+        this.selectedItem = null; // Für Mobile Click-to-Select
+        this.isMobile = this.detectMobile();
 
         this.roomData = {
             bedroom: {
@@ -197,6 +199,22 @@ class AufraumSpiel {
         }
 
         this.updateDisplay();
+
+        // Global click handler um Selektion aufzuheben
+        document.addEventListener('click', (e) => {
+            if (this.selectedItem) {
+                // Nur deselektieren wenn nicht auf Item, Zone, Label oder Mobile-Area geklickt
+                if (!e.target.closest('.draggable-item') &&
+                    !e.target.closest('.drop-zone') &&
+                    !e.target.closest('.furniture-label') &&
+                    !e.target.closest('.mobile-click-area')) {
+                    console.log('🔄 Global click - deselecting item');
+                    this.deselectItem();
+                } else {
+                    console.log('🎯 Click on valid element, keeping selection');
+                }
+            }
+        });
     }
 
     showScreen(screenId) {
@@ -247,7 +265,191 @@ class AufraumSpiel {
         return levelNames[this.currentLevel];
     }
 
-    setupRoom(roomData) {
+    // Mobile Detection
+    detectMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+               ('ontouchstart' in window) ||
+               (navigator.maxTouchPoints > 0);
+    }
+
+    // Mobile Click-to-Select System
+    selectItem(itemElement) {
+        console.log('Selecting item:', itemElement.querySelector('.item-label').textContent); // Debug
+
+        // Deselect previously selected item
+        if (this.selectedItem) {
+            this.selectedItem.classList.remove('selected');
+        }
+
+        // Select new item
+        this.selectedItem = itemElement;
+        itemElement.classList.add('selected');
+
+        console.log('Item selected. Correct zone:', itemElement.dataset.correctZone); // Debug
+
+        // Show instruction message
+        this.showMobileInstruction();
+    }
+
+    deselectItem() {
+        if (this.selectedItem) {
+            this.selectedItem.classList.remove('selected');
+            this.selectedItem = null;
+            this.hideMobileInstruction();
+        }
+    }
+
+    showMobileInstruction() {
+        let instruction = document.getElementById('mobile-instruction');
+        if (!instruction) {
+            instruction = document.createElement('div');
+            instruction.id = 'mobile-instruction';
+            instruction.className = 'mobile-instruction';
+
+            // Suche nach verfügbaren Containern
+            const gameArea = document.getElementById('game-area') ||
+                           document.querySelector('.room-3d') ||
+                           document.body;
+            gameArea.appendChild(instruction);
+        }
+
+        // Zeige verfügbare Zonen für das ausgewählte Item
+        const itemType = this.selectedItem.dataset.itemType;
+        const correctZone = this.selectedItem.dataset.correctZone;
+        instruction.innerHTML = `📱 Tippe auf <strong>${this.getZoneName(correctZone)}</strong> um "${this.selectedItem.querySelector('.item-label').textContent}" zu platzieren!`;
+        instruction.style.display = 'block';
+
+        // Markiere die richtige Zone
+        this.highlightCorrectZone(correctZone);
+    }
+
+    getZoneName(zoneId) {
+        const zoneElement = document.querySelector(`[data-zone-id="${zoneId}"]`);
+        if (zoneElement) {
+            const label = document.querySelector(`.furniture-label`);
+            // Finde das richtige Label basierend auf Position
+            const labels = document.querySelectorAll('.furniture-label');
+            for (let label of labels) {
+                const labelText = label.textContent.toLowerCase();
+                if (zoneId.includes('wardrobe') && labelText.includes('schrank')) return label.textContent;
+                if (zoneId.includes('desk') && labelText.includes('schreibtisch')) return label.textContent;
+                if (zoneId.includes('bed') && labelText.includes('bett')) return label.textContent;
+                if (zoneId.includes('cabinet') && labelText.includes('schrank')) return label.textContent;
+                if (zoneId.includes('sink') && (labelText.includes('spüle') || labelText.includes('waschbecken'))) return label.textContent;
+                if (zoneId.includes('storage') && labelText.includes('lager')) return label.textContent;
+            }
+        }
+        return zoneId; // Fallback
+    }
+
+    highlightCorrectZone(correctZoneId) {
+        // Entferne alle Highlights
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.classList.remove('mobile-highlight');
+        });
+
+        // Highlighte die richtige Zone
+        const correctZone = document.querySelector(`[data-zone-id="${correctZoneId}"]`);
+        if (correctZone) {
+            correctZone.classList.add('mobile-highlight');
+        }
+    }
+
+    hideMobileInstruction() {
+        const instruction = document.getElementById('mobile-instruction');
+        if (instruction) {
+            instruction.style.display = 'none';
+        }
+
+        // Entferne Zone Highlights
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.classList.remove('mobile-highlight');
+        });
+    }
+
+    // Universal Zone Click Handler (Mobile & Desktop)
+    handleZoneClick(zoneElement) {
+        console.log('handleZoneClick called:', {
+            hasSelectedItem: !!this.selectedItem,
+            isMobile: this.isMobile,
+            zoneId: zoneElement.dataset.zoneId
+        }); // Debug
+
+        if (!this.selectedItem) {
+            console.log('No item selected, ignoring zone click'); // Debug
+            return;
+        }
+
+        const zoneId = zoneElement.dataset.zoneId;
+        const itemType = this.selectedItem.dataset.itemType;
+        const correctZone = this.selectedItem.dataset.correctZone;
+
+        console.log('Zone placement attempt:', {
+            zoneId,
+            itemType,
+            correctZone,
+            isValid: this.isValidPlacement(zoneId, itemType, correctZone)
+        }); // Debug
+
+        if (this.isValidPlacement(zoneId, itemType, correctZone)) {
+            console.log('Valid placement - placing item'); // Debug
+            this.placeItemInZone(this.selectedItem, zoneElement);
+            this.deselectItem();
+        } else {
+            console.log('Invalid placement'); // Debug
+            this.showMessage('❌ Das gehört hier nicht hin!', 'error');
+            // Kurz rot blinken lassen
+            zoneElement.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
+            setTimeout(() => {
+                zoneElement.style.backgroundColor = '';
+            }, 500);
+        }
+    }
+
+    // Validiere ob Item in Zone platziert werden kann
+    isValidPlacement(zoneId, itemType, correctZone) {
+        return zoneId === correctZone;
+    }
+
+    // Universelle Item-Platzierung für Drag&Drop und Click-to-Select
+    placeItemInZone(itemElement, zoneElement) {
+        // Berechne Zonen-Center Position
+        const zoneRect = zoneElement.getBoundingClientRect();
+        const containerRect = document.querySelector('.room-3d').getBoundingClientRect();
+
+        const centerX = ((zoneRect.left + zoneRect.width / 2 - containerRect.left) / containerRect.width) * 100;
+        const centerY = ((zoneRect.top + zoneRect.height / 2 - containerRect.top) / containerRect.height) * 100;
+
+        // Platziere Item in der Mitte der Zone
+        itemElement.style.left = `${centerX}%`;
+        itemElement.style.top = `${centerY}%`;
+        itemElement.style.transform = 'translate(-50%, -50%)';
+
+        // Markiere als platziert
+        itemElement.classList.add('placed');
+        itemElement.style.opacity = '0.7';
+        itemElement.style.pointerEvents = 'none';
+
+        // Erfolgs-Feedback
+        this.cleanedItems++;
+        this.score += 10;
+        this.updateDisplay();
+
+        this.showMessage('✅ Richtig platziert! +10 Punkte', 'success');
+
+        // Grüner Erfolgs-Effekt
+        zoneElement.style.backgroundColor = 'rgba(0, 255, 0, 0.3)';
+        setTimeout(() => {
+            zoneElement.style.backgroundColor = '';
+        }, 1000);
+
+        // Prüfe ob Raum fertig
+        if (this.cleanedItems >= this.totalItems) {
+            setTimeout(() => {
+                this.roomCompleted();
+            }, 1500);
+        }
+    }    setupRoom(roomData) {
         // Clear containers
         const containers = ['.items-container', '.drop-zones', '.furniture-labels'];
         containers.forEach(selector => {
@@ -257,6 +459,7 @@ class AufraumSpiel {
 
         this.createZones(roomData.zones);
         this.createItems(roomData.items);
+        this.createMobileClickAreas(roomData.zones); // Neue Click-Bereiche
     }
 
     createZones(zones) {
@@ -274,25 +477,141 @@ class AufraumSpiel {
             dropZone.style.height = `${zone.h}%`;
             dropZone.dataset.zoneId = zone.id;
             dropZone.dataset.accepts = zone.accepts.join(',');
+
+            // Universal Click Handler für Zonen (Mobile & Desktop)
+            dropZone.addEventListener('click', (e) => {
+                if (this.selectedItem) {  // Vereinfacht - checke nur ob Item ausgewählt
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Zone clicked:', dropZone.dataset.zoneId, 'Mobile:', this.isMobile); // Debug
+                    this.handleZoneClick(dropZone);
+                }
+            });
+
+            // Touch Events für mobile Zonen
+            dropZone.addEventListener('touchstart', (e) => {
+                if (this.selectedItem) {
+                    e.preventDefault();
+                    // Visueller Feedback
+                    dropZone.style.backgroundColor = 'rgba(0, 123, 255, 0.3)';
+                    console.log('Zone touch start:', dropZone.dataset.zoneId); // Debug
+                }
+            });
+
+            dropZone.addEventListener('touchend', (e) => {
+                if (this.selectedItem) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Zone touched:', dropZone.dataset.zoneId); // Debug
+                    this.handleZoneClick(dropZone);
+                    // Reset visual feedback
+                    setTimeout(() => {
+                        dropZone.style.backgroundColor = '';
+                    }, 200);
+                }
+            });
+
             container.appendChild(dropZone);
 
-            // Label
-            const label = document.createElement('div');
-            label.className = 'furniture-label';
+            // Erstelle Button anstatt Label für bessere Klickbarkeit
+            const label = document.createElement('button');
+            label.className = 'furniture-label furniture-button';
             label.textContent = zone.name;
+            label.type = 'button';
             label.style.position = 'absolute';
             label.style.left = `${zone.x + zone.w/2}%`;
-            label.style.top = `${zone.y - 4}%`;
+            label.style.top = `${zone.y - 8}%`;
             label.style.transform = 'translateX(-50%)';
-            label.style.background = 'rgba(0,0,0,0.8)';
-            label.style.color = 'white';
-            label.style.padding = '4px 8px';
-            label.style.borderRadius = '4px';
-            label.style.fontSize = '0.8em';
-            label.style.fontWeight = 'bold';
-            label.style.zIndex = '20';
-            label.style.pointerEvents = 'none';
-            container.appendChild(label);
+            label.style.zIndex = '999';
+            label.style.pointerEvents = 'auto';
+            label.style.cursor = 'pointer';
+            label.dataset.zoneId = zone.id;
+
+            console.log('Creating BUTTON:', zone.name, 'with zone ID:', zone.id);            // Bessere Mobile-Sichtbarkeit
+            if (this.isMobile) {
+                label.style.fontSize = '1.2em';
+                label.style.padding = '12px 16px';
+                label.style.minWidth = '100px';
+                label.style.minHeight = '40px';
+                label.style.borderRadius = '10px';
+                label.style.border = '2px solid rgba(255,255,255,0.6)';
+            }
+
+            // Einfacher, direkter Click-Handler
+            const self = this; // Referenz für den Event-Handler
+
+            label.onclick = function(e) {
+                console.log('� BUTTON CLICKED:', zone.name, 'Selected item:', !!self.selectedItem);
+
+                if (self.selectedItem) {
+                    console.log('👍 Processing zone click...');
+                    self.handleZoneClick(dropZone);
+                } else {
+                    console.log('❌ No item selected');
+                    alert('Bitte wähle zuerst einen Gegenstand aus!');
+                }
+
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            };
+
+            // Touch Support
+            label.addEventListener('touchend', function(e) {
+                console.log('📱 BUTTON TOUCHED:', zone.name);
+                e.preventDefault();
+
+                if (self.selectedItem) {
+                    self.handleZoneClick(dropZone);
+                } else {
+                    alert('Bitte wähle zuerst einen Gegenstand aus!');
+                }
+            });            container.appendChild(label);
+        });
+    }
+
+    // Erstelle kompakte Click-Bereiche für Mobile (nur Name-Größe)
+    createMobileClickAreas(zones) {
+        const container = document.querySelector('.room-3d');
+        if (!container) return;
+
+        zones.forEach(zone => {
+            // Erstelle kompakten Click-Bereich nur für den Namen
+            const clickArea = document.createElement('div');
+            clickArea.className = 'mobile-click-area';
+            clickArea.style.position = 'absolute';
+            clickArea.style.left = `${zone.x + zone.w/2}%`; // Zentriert in der Zone
+            clickArea.style.top = `${zone.y + zone.h/2}%`;
+            clickArea.style.transform = 'translate(-50%, -50%)'; // Zentriert
+            clickArea.style.background = 'rgba(0, 255, 0, 0.8)'; // Sichtbares Grün
+            clickArea.style.border = '2px solid lime';
+            clickArea.style.borderRadius = '8px';
+            clickArea.style.zIndex = '1000';
+            clickArea.style.cursor = 'pointer';
+            clickArea.style.padding = '10px 15px'; // Nur um Text herum
+            clickArea.style.fontSize = '1em';
+            clickArea.style.fontWeight = 'bold';
+            clickArea.style.color = 'white';
+            clickArea.style.textShadow = '1px 1px 2px black';
+            clickArea.style.whiteSpace = 'nowrap'; // Text nicht umbrechen
+            clickArea.dataset.zoneId = zone.id;
+
+            // Text direkt im Click-Area (kein separates Label)
+            clickArea.textContent = zone.name;
+
+            // Einfacher Click-Handler
+            clickArea.onclick = (e) => {
+                console.log('🟢 MOBILE AREA CLICKED:', zone.name);
+                if (this.selectedItem) {
+                    console.log('📦 Placing item in zone:', zone.id);
+                    this.handleZoneClick(clickArea);
+                } else {
+                    alert('Bitte wähle zuerst einen Gegenstand!');
+                }
+                e.stopPropagation();
+            };
+
+            container.appendChild(clickArea);
         });
     }
 
@@ -351,7 +670,30 @@ class AufraumSpiel {
                     this.startDrag(itemDiv, e);
                 });
 
-                container.appendChild(itemDiv);
+                // Universal Click-to-Select für alle Geräte
+                itemDiv.addEventListener('click', (e) => {
+                    if (itemDiv.classList.contains('placed')) return;
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    console.log('Item clicked:', item.label, 'Mobile:', this.isMobile); // Debug
+
+                    if (this.selectedItem === itemDiv) {
+                        this.deselectItem(); // Deselect if already selected
+                    } else {
+                        this.selectItem(itemDiv); // Select new item
+                    }
+                });
+
+                // Touch Events für bessere Mobile Experience
+                itemDiv.addEventListener('touchstart', (e) => {
+                    if (itemDiv.classList.contains('placed')) return;
+
+                    e.preventDefault();
+                    console.log('Item touched:', item.label); // Debug
+                    this.selectItem(itemDiv);
+                });                container.appendChild(itemDiv);
             }
         });
 
@@ -458,40 +800,11 @@ class AufraumSpiel {
         const itemType = this.activeElement.dataset.itemType;
         const correctZone = this.activeElement.dataset.correctZone;
         const zoneId = dropZone.dataset.zoneId;
-        const accepts = dropZone.dataset.accepts.split(',');
 
-        if (correctZone === zoneId && accepts.includes(itemType)) {
-            this.correctPlacement(dropZone);
+        if (this.isValidPlacement(zoneId, itemType, correctZone)) {
+            this.placeItemInZone(this.activeElement, dropZone);
         } else {
             this.wrongPlacement();
-        }
-    }
-
-    correctPlacement(dropZone) {
-        // Position in der Mitte der Zone
-        const zoneRect = dropZone.getBoundingClientRect();
-        const containerRect = document.querySelector('.room-3d').getBoundingClientRect();
-
-        const centerX = ((zoneRect.left - containerRect.left + zoneRect.width/2 - 40) / containerRect.width) * 100;
-        const centerY = ((zoneRect.top - containerRect.top + zoneRect.height/2 - 40) / containerRect.height) * 100;
-
-        // Element dauerhaft positionieren
-        this.activeElement.style.left = `${centerX}%`;
-        this.activeElement.style.top = `${centerY}%`;
-        this.activeElement.classList.add('placed');
-        this.activeElement.style.pointerEvents = 'none';
-
-        // Erfolg
-        this.showMessage('✅ Perfekt platziert!', 'success');
-        this.score += 20;
-        this.cleanedItems++;
-        this.updateDisplay();
-
-        // Check completion
-        if (this.cleanedItems >= this.totalItems) {
-            setTimeout(() => {
-                this.roomCompleted();
-            }, 1000);
         }
     }
 
