@@ -319,8 +319,10 @@ class AufraumSpiel {
         instruction.innerHTML = `📱 Tippe auf <strong>${this.getZoneName(correctZone)}</strong> um "${this.selectedItem.querySelector('.item-label').textContent}" zu platzieren!`;
         instruction.style.display = 'block';
 
-        // Markiere die richtige Zone
-        this.highlightCorrectZone(correctZone);
+        // Markiere die richtige Zone nur auf einfachstem Level (Level 0)
+        if (this.currentLevel === 0) {
+            this.highlightCorrectZone(correctZone);
+        }
     }
 
     getZoneName(zoneId) {
@@ -570,49 +572,157 @@ class AufraumSpiel {
         });
     }
 
-    // Erstelle kompakte Click-Bereiche für Mobile (nur Name-Größe)
+    // Erstelle realistische Click-Bereiche für Mobile mit speziellen Möbelteilen
     createMobileClickAreas(zones) {
         const container = document.querySelector('.room-3d');
         if (!container) return;
 
         zones.forEach(zone => {
-            // Erstelle kompakten Click-Bereich nur für den Namen
-            const clickArea = document.createElement('div');
-            clickArea.className = 'mobile-click-area';
-            clickArea.style.position = 'absolute';
-            clickArea.style.left = `${zone.x + zone.w/2}%`; // Zentriert in der Zone
-            clickArea.style.top = `${zone.y + zone.h/2}%`;
-            clickArea.style.transform = 'translate(-50%, -50%)'; // Zentriert
-            clickArea.style.background = 'rgba(0, 255, 0, 0.8)'; // Sichtbares Grün
-            clickArea.style.border = '2px solid lime';
-            clickArea.style.borderRadius = '8px';
-            clickArea.style.zIndex = '1000';
-            clickArea.style.cursor = 'pointer';
-            clickArea.style.padding = '10px 15px'; // Nur um Text herum
-            clickArea.style.fontSize = '1em';
-            clickArea.style.fontWeight = 'bold';
-            clickArea.style.color = 'white';
-            clickArea.style.textShadow = '1px 1px 2px black';
-            clickArea.style.whiteSpace = 'nowrap'; // Text nicht umbrechen
-            clickArea.dataset.zoneId = zone.id;
+            const name = zone.name.toLowerCase();
 
-            // Text direkt im Click-Area (kein separates Label)
-            clickArea.textContent = zone.name;
-
-            // Einfacher Click-Handler
-            clickArea.onclick = (e) => {
-                console.log('🟢 MOBILE AREA CLICKED:', zone.name);
-                if (this.selectedItem) {
-                    console.log('📦 Placing item in zone:', zone.id);
-                    this.handleZoneClick(clickArea);
-                } else {
-                    alert('Bitte wähle zuerst einen Gegenstand!');
-                }
-                e.stopPropagation();
-            };
-
-            container.appendChild(clickArea);
+            // Spezielle Behandlung für Küchenschrank und Gewächshaus
+            if (name.includes('küchenschrank') || name.includes('küchenzeile')) {
+                this.createKitchenCabinet(container, zone);
+            } else if (name.includes('gewächshaus')) {
+                this.createGreenhouse(container, zone);
+            } else {
+                // Standard kompakter Click-Bereich für andere Möbel
+                this.createStandardClickArea(container, zone);
+            }
         });
+    }
+
+    // Küchenschrank mit Türen
+    createKitchenCabinet(container, zone) {
+        // Linke Küchenschranktür
+        const leftDoor = document.createElement('div');
+        leftDoor.className = 'mobile-click-area kitchen-door';
+        leftDoor.style.position = 'absolute';
+        leftDoor.style.left = `${zone.x + 2}%`;
+        leftDoor.style.top = `${zone.y + 10}%`;
+        leftDoor.style.width = `${zone.w/2 - 3}%`;
+        leftDoor.style.height = `${zone.h - 20}%`;
+        leftDoor.style.background = 'linear-gradient(135deg, #8B4513, #A0522D)';
+        leftDoor.style.border = '2px solid #654321';
+        leftDoor.style.borderRadius = '5px';
+        leftDoor.style.zIndex = '1000';
+        leftDoor.style.cursor = 'pointer';
+        leftDoor.style.boxShadow = '2px 2px 4px rgba(0,0,0,0.3)';
+        leftDoor.dataset.zoneId = zone.id;
+        leftDoor.title = '🚪 ' + zone.name;
+        leftDoor.textContent = '🚪';
+        leftDoor.style.display = 'flex';
+        leftDoor.style.alignItems = 'center';
+        leftDoor.style.justifyContent = 'center';
+        leftDoor.style.fontSize = '1.2em';
+
+        // Rechte Küchenschranktür
+        const rightDoor = document.createElement('div');
+        rightDoor.className = 'mobile-click-area kitchen-door';
+        rightDoor.style.position = 'absolute';
+        rightDoor.style.left = `${zone.x + zone.w/2 + 1}%`;
+        rightDoor.style.top = `${zone.y + 10}%`;
+        rightDoor.style.width = `${zone.w/2 - 3}%`;
+        rightDoor.style.height = `${zone.h - 20}%`;
+        rightDoor.style.background = 'linear-gradient(135deg, #8B4513, #A0522D)';
+        rightDoor.style.border = '2px solid #654321';
+        rightDoor.style.borderRadius = '5px';
+        rightDoor.style.zIndex = '1000';
+        rightDoor.style.cursor = 'pointer';
+        rightDoor.style.boxShadow = '2px 2px 4px rgba(0,0,0,0.3)';
+        rightDoor.dataset.zoneId = zone.id;
+        rightDoor.title = '🚪 ' + zone.name;
+        rightDoor.textContent = '🚪';
+        rightDoor.style.display = 'flex';
+        rightDoor.style.alignItems = 'center';
+        rightDoor.style.justifyContent = 'center';
+        rightDoor.style.fontSize = '1.2em';
+
+        this.addClickHandler(leftDoor, zone);
+        this.addClickHandler(rightDoor, zone);
+
+        container.appendChild(leftDoor);
+        container.appendChild(rightDoor);
+    }
+
+    // Gewächshaus mit Haustür
+    createGreenhouse(container, zone) {
+        // Gewächshaus-Haustür
+        const door = document.createElement('div');
+        door.className = 'mobile-click-area greenhouse-door';
+        door.style.position = 'absolute';
+        door.style.left = `${zone.x + zone.w/2 - 8}%`;
+        door.style.top = `${zone.y + zone.h/3}%`;
+        door.style.width = '16%';
+        door.style.height = `${zone.h/2}%`;
+        door.style.background = 'linear-gradient(135deg, #654321, #8B4513)';
+        door.style.border = '3px solid #2F4F2F';
+        door.style.borderRadius = '8px 8px 3px 3px';
+        door.style.zIndex = '1000';
+        door.style.cursor = 'pointer';
+        door.style.boxShadow = '3px 3px 6px rgba(0,0,0,0.4)';
+        door.dataset.zoneId = zone.id;
+        door.title = '🏠 ' + zone.name;
+        door.textContent = '🏠';
+        door.style.display = 'flex';
+        door.style.alignItems = 'center';
+        door.style.justifyContent = 'center';
+        door.style.fontSize = '1.5em';
+
+        this.addClickHandler(door, zone);
+        container.appendChild(door);
+    }
+
+    // Standard Click-Bereich für andere Möbel
+    createStandardClickArea(container, zone) {
+        const clickArea = document.createElement('div');
+        clickArea.className = 'mobile-click-area';
+        clickArea.style.position = 'absolute';
+        clickArea.style.left = `${zone.x + zone.w/2}%`;
+        clickArea.style.top = `${zone.y + zone.h/2}%`;
+        clickArea.style.transform = 'translate(-50%, -50%)';
+        clickArea.style.background = 'rgba(0, 255, 0, 0.8)';
+        clickArea.style.border = '2px solid lime';
+        clickArea.style.borderRadius = '8px';
+        clickArea.style.zIndex = '1000';
+        clickArea.style.cursor = 'pointer';
+        clickArea.style.padding = '10px 15px';
+        clickArea.style.fontSize = '1em';
+        clickArea.style.fontWeight = 'bold';
+        clickArea.style.color = 'white';
+        clickArea.style.textShadow = '1px 1px 2px black';
+        clickArea.style.whiteSpace = 'nowrap';
+        clickArea.dataset.zoneId = zone.id;
+        clickArea.textContent = zone.name;
+
+        this.addClickHandler(clickArea, zone);
+        container.appendChild(clickArea);
+    }
+
+    // Einheitlicher Click-Handler
+    addClickHandler(element, zone) {
+        element.onclick = (e) => {
+            console.log('🪑 FURNITURE CLICKED:', zone.name);
+            if (this.selectedItem) {
+                console.log('📦 Placing item in zone:', zone.id);
+                this.handleZoneClick(element);
+            } else {
+                alert('Bitte wähle zuerst einen Gegenstand!');
+            }
+            e.stopPropagation();
+        };
+
+        // Hover-Effekte
+        element.onmouseenter = () => {
+            element.style.transform = element.style.transform.includes('translate')
+                ? element.style.transform + ' scale(1.1)'
+                : 'scale(1.1)';
+            element.style.filter = 'brightness(1.2)';
+        };
+        element.onmouseleave = () => {
+            element.style.transform = element.style.transform.replace(' scale(1.1)', '');
+            element.style.filter = 'brightness(1)';
+        };
     }
 
     createItems(items) {

@@ -1108,7 +1108,7 @@ header h1 {
         align-items: center;
     }
 
-    /* Mobile Click-Bereiche - kompakt */
+    /* Mobile Click-Bereiche - realistische Möbelteile */
     .mobile-click-area {
         transition: all 0.2s ease;
         user-select: none;
@@ -1116,8 +1116,30 @@ header h1 {
         touch-action: manipulation;
     }
 
-    .mobile-click-area:hover,
-    .mobile-click-area:active {
+    /* Küchenschrank-Türen */
+    .mobile-click-area.kitchen-door {
+        background: linear-gradient(135deg, #8B4513, #A0522D) !important;
+    }
+
+    .mobile-click-area.kitchen-door:hover {
+        background: linear-gradient(135deg, #A0522D, #CD853F) !important;
+        transform: scale(1.05);
+    }
+
+    /* Gewächshaus-Tür */
+    .mobile-click-area.greenhouse-door {
+        background: linear-gradient(135deg, #654321, #8B4513) !important;
+        border-radius: 8px 8px 3px 3px !important;
+    }
+
+    .mobile-click-area.greenhouse-door:hover {
+        background: linear-gradient(135deg, #8B4513, #A0522D) !important;
+        transform: scale(1.08);
+    }
+
+    /* Standard Click-Bereiche */
+    .mobile-click-area:not(.kitchen-door):not(.greenhouse-door):hover,
+    .mobile-click-area:not(.kitchen-door):not(.greenhouse-door):active {
         background: rgba(0, 255, 0, 1) !important;
         transform: translate(-50%, -50%) scale(1.1);
     }
