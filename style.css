@@ -1,0 +1,536 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #74b9ff, #0984e3);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+}
+
+.game-container {
+    width: 100%;
+    max-width: 1000px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+    min-height: 700px;
+}
+
+header {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.2em;
+    margin-bottom: 10px;
+}
+
+.score-board {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.screen {
+    display: none;
+    padding: 30px;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* Raumauswahl */
+#room-selection h2 {
+    text-align: center;
+    color: #2d3436;
+    margin-bottom: 40px;
+    font-size: 1.8em;
+}
+
+.room-buttons {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.room-btn {
+    background: linear-gradient(135deg, #00cec9, #00b894);
+    border: none;
+    border-radius: 15px;
+    padding: 30px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    color: white;
+    font-size: 1.1em;
+    min-width: 200px;
+}
+
+.room-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+.room-icon {
+    font-size: 4em;
+    margin-bottom: 10px;
+}
+
+.room-name {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* Spielbereich */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+#back-btn, #reset-room {
+    background: #636e72;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#back-btn:hover, #reset-room:hover {
+    background: #2d3436;
+}
+
+#current-room-title {
+    color: #2d3436;
+    font-size: 1.5em;
+}
+
+/* 3D Raum Container */
+.room-3d {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    perspective: 1200px;
+    background: linear-gradient(180deg, #87CEEB 0%, #98D8E8 30%, #D2B48C 30%, #DEB887 100%);
+    overflow: hidden;
+    border-radius: 15px;
+    margin: 20px 0;
+}
+
+/* Raum-Wände */
+.room-walls {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+.wall {
+    position: absolute;
+    border: 2px solid #8B4513;
+}
+
+.back-wall {
+    width: 80%;
+    height: 60%;
+    background: linear-gradient(45deg, #F5DEB3, #DEB887);
+    left: 10%;
+    top: 10%;
+    transform: translateZ(-200px);
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
+}
+
+.left-wall {
+    width: 200px;
+    height: 60%;
+    background: linear-gradient(45deg, #E6D3A3, #D4C196);
+    left: 10%;
+    top: 10%;
+    transform-origin: right center;
+    transform: rotateY(-80deg);
+}
+
+.right-wall {
+    width: 200px;
+    height: 60%;
+    background: linear-gradient(45deg, #E6D3A3, #D4C196);
+    right: 10%;
+    top: 10%;
+    transform-origin: left center;
+    transform: rotateY(80deg);
+}
+
+.floor {
+    width: 80%;
+    height: 200px;
+    background: repeating-linear-gradient(
+        90deg,
+        #8B4513 0px,
+        #8B4513 2px,
+        #A0522D 2px,
+        #A0522D 20px
+    );
+    left: 10%;
+    bottom: 0;
+    transform-origin: top center;
+    transform: rotateX(80deg);
+    opacity: 0.8;
+}
+
+/* Möbel und Einrichtung */
+.furniture-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.furniture {
+    position: absolute;
+    background: #8B4513;
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+}
+
+/* Gegenstände */
+.items-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+
+.draggable-item {
+    position: absolute;
+    cursor: grab;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.95);
+    border: 3px solid #3498db;
+    user-select: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    min-width: 80px;
+}
+
+.draggable-item .item-emoji {
+    font-size: 2.5em;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.draggable-item .item-label {
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #2c3e50;
+    background: rgba(52, 152, 219, 0.1);
+    padding: 2px 6px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.draggable-item:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.draggable-item.dragging {
+    cursor: grabbing;
+    transform: scale(1.2) rotate(5deg);
+    z-index: 1000;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.draggable-item.placed {
+    opacity: 0.7;
+    cursor: default;
+    border-color: #00b894;
+    background: rgba(0,184,148,0.2);
+}
+
+/* Drop Zones */
+.drop-zones {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+}
+
+.drop-zone {
+    position: absolute;
+    border: 3px dashed rgba(52, 152, 219, 0.4);
+    border-radius: 12px;
+    transition: all 0.3s;
+    background: rgba(116, 185, 255, 0.15);
+}
+
+/* Möbel-Labels */
+.furniture-labels {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 15;
+    pointer-events: none;
+}
+
+.furniture-label {
+    position: absolute;
+    background: rgba(44, 62, 80, 0.9);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    border: 2px solid #ecf0f1;
+}
+
+.furniture-label.wardrobe-label {
+    background: rgba(139, 69, 19, 0.9);
+}
+
+.furniture-label.desk-label {
+    background: rgba(210, 105, 30, 0.9);
+}
+
+.furniture-label.bed-label {
+    background: rgba(65, 105, 225, 0.9);
+}
+
+.furniture-label.cabinet-label {
+    background: rgba(105, 105, 105, 0.9);
+}
+
+.furniture-label.stove-label {
+    background: rgba(47, 79, 79, 0.9);
+}
+
+.furniture-label.sink-label {
+    background: rgba(192, 192, 192, 0.9);
+    color: #2c3e50;
+}
+
+.drop-zone.highlight {
+    border-color: #00b894;
+    background: rgba(0,184,148,0.2);
+    transform: scale(1.05);
+}
+
+.drop-zone.correct-drop {
+    border-color: #00b894;
+    background: rgba(0,184,148,0.3);
+    animation: successPulse 0.6s ease-out;
+}
+
+.drop-zone.wrong-drop {
+    border-color: #d63031;
+    background: rgba(214,48,49,0.2);
+    animation: errorShake 0.6s ease-out;
+}
+
+@keyframes successPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.instructions {
+    text-align: center;
+    margin-top: 20px;
+    color: #636e72;
+    font-size: 1.1em;
+}
+
+/* Drag Feedback */
+.drag-feedback {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 1.1em;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1001;
+    pointer-events: none;
+}
+
+.drag-feedback.show {
+    opacity: 1;
+}
+
+.drag-feedback.success {
+    background: rgba(0,184,148,0.9);
+}
+
+.drag-feedback.error {
+    background: rgba(214,48,49,0.9);
+}
+
+/* Spezielle Möbel-Styles für verschiedene Räume */
+.bedroom-furniture .wardrobe {
+    width: 120px;
+    height: 180px;
+    right: 15%;
+    bottom: 20%;
+    background: linear-gradient(45deg, #8B4513, #A0522D);
+}
+
+.bedroom-furniture .bed {
+    width: 200px;
+    height: 100px;
+    left: 15%;
+    bottom: 25%;
+    background: linear-gradient(45deg, #4169E1, #6495ED);
+}
+
+.bedroom-furniture .desk {
+    width: 150px;
+    height: 80px;
+    left: 45%;
+    bottom: 15%;
+    background: linear-gradient(45deg, #D2691E, #CD853F);
+}
+
+.kitchen-furniture .cabinet {
+    width: 100px;
+    height: 120px;
+    right: 20%;
+    bottom: 30%;
+    background: linear-gradient(45deg, #696969, #778899);
+}
+
+.kitchen-furniture .stove {
+    width: 80px;
+    height: 60px;
+    left: 20%;
+    bottom: 35%;
+    background: linear-gradient(45deg, #2F4F4F, #708090);
+}
+
+.kitchen-furniture .sink {
+    width: 100px;
+    height: 80px;
+    left: 35%;
+    bottom: 30%;
+    background: linear-gradient(45deg, #C0C0C0, #D3D3D3);
+}
+
+/* Erfolgsmeldung */
+.success-content {
+    text-align: center;
+}
+
+.success-content h2 {
+    color: #00b894;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.success-content p {
+    font-size: 1.3em;
+    color: #2d3436;
+    margin-bottom: 20px;
+}
+
+.final-score {
+    background: linear-gradient(135deg, #fdcb6e, #e17055);
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
+    font-size: 1.4em;
+    font-weight: bold;
+}
+
+.success-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.success-buttons button {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 25px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: transform 0.3s;
+}
+
+.success-buttons button:hover {
+    transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .game-container {
+        margin: 10px;
+        border-radius: 15px;
+    }
+
+    .room-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .room-btn {
+        min-width: 250px;
+    }
+
+    .game-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    #room-display {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 15px;
+    }
+
+    .item {
+        font-size: 2.5em;
+    }
+
+    .success-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}

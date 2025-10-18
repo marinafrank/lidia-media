@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Aufräum-Spiel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>🏠 3D Aufräum-Spiel</h1>
+            <div class="score-board">
+                <span>Punkte: <span id="score">0</span></span>
+                <span>Aufgeräumt: <span id="cleaned-items">0</span>/<span id="total-items">0</span></span>
+            </div>
+        </header>
+
+        <main>
+            <!-- Raumauswahl -->
+            <div id="room-selection" class="screen active">
+                <h2>Welchen Raum möchtest du erkunden?</h2>
+                <div class="room-buttons">
+                    <button class="room-btn" data-room="bedroom">
+                        <div class="room-icon">🛏️</div>
+                        <div class="room-name">Schlafzimmer</div>
+                    </button>
+                    <button class="room-btn" data-room="kitchen">
+                        <div class="room-icon">🍳</div>
+                        <div class="room-name">Küche</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Spielbereich -->
+            <div id="game-area" class="screen">
+                <div class="game-header">
+                    <button id="back-btn">← Zurück zur Raumauswahl</button>
+                    <h2 id="current-room-title"></h2>
+                    <button id="reset-room">Raum zurücksetzen</button>
+                </div>
+
+                <!-- 3D Raum mit Drag & Drop -->
+                <div class="room-3d">
+                    <!-- Wände und Möbel -->
+                    <div class="room-walls">
+                        <div class="wall back-wall"></div>
+                        <div class="wall left-wall"></div>
+                        <div class="wall right-wall"></div>
+                        <div class="floor"></div>
+                    </div>
+
+                    <!-- Möbel und Ablageflächen -->
+                    <div class="furniture-container">
+                        <!-- Wird je nach Raum dynamisch gefüllt -->
+                    </div>
+
+                    <!-- Gegenstände zum Aufräumen -->
+                    <div class="items-container">
+                        <!-- Wird dynamisch mit Gegenständen gefüllt -->
+                    </div>
+
+                <!-- Drop-Zones für korrekte Plätze -->
+                    <div class="drop-zones">
+                        <!-- Wird dynamisch erstellt -->
+                    </div>
+
+                    <!-- Möbel-Labels -->
+                    <div class="furniture-labels">
+                        <!-- Wird dynamisch erstellt -->
+                    </div>
+                </div>
+
+                <div class="instructions">
+                    <p>🖱️ Ziehe die Gegenstände an ihre richtigen Plätze!</p>
+                    <p>💡 Tipp: Schaue auf die Beschriftungen der Möbel!</p>
+                </div>                <!-- Drag Feedback -->
+                <div id="drag-feedback" class="drag-feedback">
+                    <span id="feedback-text"></span>
+                </div>
+            </div>
+
+            <!-- Erfolgsmeldung -->
+            <div id="success-screen" class="screen">
+                <div class="success-content">
+                    <h2>🎉 Perfekt aufgeräumt!</h2>
+                    <p>Du hast alles an seinen richtigen Platz gebracht!</p>
+                    <div class="final-score">
+                        <p>Deine Punkte: <span id="final-score">0</span></p>
+                        <p>Perfekte Platzierungen: <span id="perfect-placements">0</span></p>
+                    </div>
+                    <div class="success-buttons">
+                        <button id="play-again">Nochmal spielen</button>
+                        <button id="choose-other-room">Anderen Raum wählen</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+            <!-- Erfolgsmeldung -->
+            <div id="success-screen" class="screen">
+                <div class="success-content">
+                    <h2>🎉 Perfekt aufgeräumt!</h2>
+                    <p>Du hast alles an seinen richtigen Platz gebracht!</p>
+                    <div class="final-score">
+                        <p>Deine Punkte: <span id="final-score">0</span></p>
+                        <p>Perfekte Platzierungen: <span id="perfect-placements">0</span></p>
+                    </div>
+                    <div class="success-buttons">
+                        <button id="play-again">Nochmal spielen</button>
+                        <button id="choose-other-room">Anderen Raum wählen</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="fixed-script.js"></script>
+</body>
+</html>
