@@ -70,10 +70,17 @@ header h1 {
 
 .room-selection-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
-    max-width: 700px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 900px;
     margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+    .room-selection-grid {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 600px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -111,7 +118,15 @@ header h1 {
 .room-icon {
     font-size: 4em;
     margin-bottom: 10px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI Emoji', 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Symbol', sans-serif;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
+
+/* Echte Emojis brauchen keine CSS-Icons mehr! */
 
 .room-name {
     font-weight: bold;
@@ -157,6 +172,262 @@ header h1 {
     overflow: hidden;
     border-radius: 15px;
     margin: 20px 0;
+}
+
+/* Thematische Hintergründe für verschiedene Räume */
+
+/* Schlafzimmer - warme, gemütliche Farben */
+.room-3d.bedroom {
+    background: linear-gradient(180deg, #F5F5DC 0%, #FFF8DC 40%, #8B7355 40%, #A0826D 100%);
+}
+
+/* Küche - saubere, helle Farben */
+.room-3d.kitchen {
+    background: linear-gradient(180deg, #F0F8FF 0%, #E6F3FF 35%, #FFFACD 35%, #FFF8DC 100%);
+}
+
+/* Badezimmer - frische, blaue Farben */
+.room-3d.bathroom {
+    background: linear-gradient(180deg, #E0F6FF 0%, #B0E0E6 40%, #F0F8FF 40%, #E6F3FF 100%);
+}
+
+/* Kinderzimmer - bunte, fröhliche Farben */
+.room-3d.kids_room {
+    background: linear-gradient(180deg, #FFE4E1 0%, #FFB6C1 35%, #FFEFD5 35%, #FFEBCD 100%);
+}
+
+/* Garten - natürliche, grüne Farben */
+.room-3d.garden {
+    background: linear-gradient(180deg, #87CEEB 0%, #98D8E8 25%, #90EE90 25%, #228B22 100%);
+}
+
+/* Garage - industrielle, graue Farben */
+.room-3d.garage {
+    background: linear-gradient(180deg, #696969 0%, #778899 35%, #C0C0C0 35%, #A9A9A9 100%);
+}
+
+/* Balkon - luftige, helle Farben */
+.room-3d.balcony {
+    background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 30%, #F5F5DC 30%, #FFFACD 100%);
+}
+
+/* Dekorative Hintergrund-Elemente für jedes Zimmer */
+
+/* Fenster für Innenräume */
+.room-decoration {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Fenster - nur für Innenräume */
+.window {
+    position: absolute;
+    width: 80px;
+    height: 100px;
+    background: linear-gradient(135deg, #E6F3FF 0%, #B0E0E6 100%);
+    border: 4px solid #8B4513;
+    border-radius: 8px;
+    top: 50px;
+    right: 30px;
+    display: none; /* Standardmäßig versteckt */
+}
+
+/* Fenster nur in Innenräumen anzeigen */
+.room-3d.bedroom .window,
+.room-3d.kitchen .window,
+.room-3d.bathroom .window,
+.room-3d.kids_room .window {
+    display: block;
+}
+
+/* Fensterkreuz */
+.window::before {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: #8B4513;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+}
+
+.window::after {
+    content: '';
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    background: #8B4513;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+}
+
+/* Blumenvase - separates Element */
+.window-vase {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 15px;
+    height: 20px;
+    background: #8B4513;
+    border-radius: 0 0 8px 8px;
+    z-index: 10;
+}
+
+.window-vase::after {
+    content: '🌸';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8em;
+    z-index: 11;
+}
+
+/* Schlafzimmer Dekoration */
+.bedroom .window {
+    background: linear-gradient(135deg, #FFE4E1 0%, #F5DEB3 100%);
+}
+
+.bedroom::before {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 40px;
+    background: #8B4513;
+    border-radius: 15px 15px 5px 5px;
+    top: 380px;
+    left: 200px;
+    z-index: 1;
+}
+
+/* Küche Dekoration */
+.kitchen .window {
+    background: linear-gradient(135deg, #F0F8FF 0%, #E0F6FF 100%);
+}
+
+.kitchen::before {
+    content: '';
+    position: absolute;
+    width: 50px;
+    height: 80px;
+    background: #C0C0C0;
+    border-radius: 8px;
+    top: 320px;
+    left: 150px;
+    z-index: 1;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+}
+
+/* Badezimmer Dekoration */
+.bathroom .window {
+    background: linear-gradient(135deg, #E0F6FF 0%, #B0E0E6 100%);
+}
+
+.bathroom::before {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 60px;
+    background: #FFF;
+    border: 3px solid #C0C0C0;
+    border-radius: 5px;
+    top: 350px;
+    left: 120px;
+    z-index: 1;
+}
+
+/* Kinderzimmer Dekoration */
+.kids_room .window {
+    background: linear-gradient(135deg, #FFE4E1 0%, #FFB6C1 100%);
+}
+
+.kids_room::before {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: #FF69B4;
+    border-radius: 50%;
+    top: 380px;
+    left: 180px;
+    z-index: 1;
+    box-shadow: 10px 0 0 #32CD32, 20px 0 0 #FFD700;
+}
+
+/* Garten Dekoration - Bäume und Blumen */
+.garden::before {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 60px;
+    background: #228B22;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    top: 250px;
+    left: 100px;
+    z-index: 1;
+}
+
+.garden::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 40px;
+    background: #8B4513;
+    top: 310px;
+    left: 116px;
+    z-index: 1;
+}
+
+/* Garage Dekoration - Werkbank */
+.garage::before {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 15px;
+    background: #8B4513;
+    top: 380px;
+    left: 50px;
+    z-index: 1;
+}
+
+.garage::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 40px;
+    background: #8B4513;
+    top: 340px;
+    left: 70px;
+    z-index: 1;
+    box-shadow: 20px 0 0 #8B4513, 40px 0 0 #8B4513, 60px 0 0 #8B4513;
+}
+
+/* Balkon Dekoration - Geländer */
+.balcony::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    background: #8B4513;
+    bottom: 150px;
+    left: 0;
+    z-index: 1;
+}
+
+.balcony::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 60px;
+    background: #8B4513;
+    bottom: 150px;
+    left: 20px;
+    z-index: 1;
+    box-shadow: 60px 0 0 #8B4513, 120px 0 0 #8B4513, 180px 0 0 #8B4513, 240px 0 0 #8B4513;
 }
 
 /* Raum-Wände */
@@ -261,10 +532,24 @@ header h1 {
 }
 
 .draggable-item .item-emoji {
-    font-size: 2.5em;
+    font-size: 2.8em;
     line-height: 1;
     margin-bottom: 2px;
+    width: 50px;
+    height: 50px;
+    background: transparent;
+    color: inherit;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: normal;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI Emoji', 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Symbol', sans-serif;
 }
+
+/* Echte Emojis brauchen keine Farbcodierung mehr! */
 
 .draggable-item .item-label {
     font-size: 0.8em;

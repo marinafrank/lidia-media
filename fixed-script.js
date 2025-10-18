@@ -12,12 +12,12 @@ class AufraumSpiel {
             bedroom: {
                 title: "🛏️ Schlafzimmer",
                 items: [
-                    { emoji: "👕", label: "T-Shirt", type: "clothing", correctZone: "wardrobe", startPos: { x: 30, y: 60 } },
-                    { emoji: "👖", label: "Hose", type: "clothing", correctZone: "wardrobe", startPos: { x: 45, y: 80 } },
-                    { emoji: "🧦", label: "Socken", type: "clothing", correctZone: "wardrobe", startPos: { x: 25, y: 40 } },
-                    { emoji: "📚", label: "Bücher", type: "study", correctZone: "desk", startPos: { x: 70, y: 30 } },
-                    { emoji: "🎮", label: "Konsole", type: "electronics", correctZone: "desk", startPos: { x: 55, y: 45 } },
-                    { emoji: "🧸", label: "Teddy", type: "toy", correctZone: "bed", startPos: { x: 20, y: 25 } }
+                    { emoji: "👕", symbol: "👕", label: "T-Shirt", type: "clothing", correctZone: "wardrobe", startPos: { x: 30, y: 60 } },
+                    { emoji: "👖", symbol: "👖", label: "Hose", type: "clothing", correctZone: "wardrobe", startPos: { x: 45, y: 80 } },
+                    { emoji: "🧦", symbol: "🧦", label: "Socken", type: "clothing", correctZone: "wardrobe", startPos: { x: 25, y: 40 } },
+                    { emoji: "📚", symbol: "📚", label: "Bücher", type: "study", correctZone: "desk", startPos: { x: 70, y: 30 } },
+                    { emoji: "🎮", symbol: "🎮", label: "Konsole", type: "electronics", correctZone: "desk", startPos: { x: 55, y: 45 } },
+                    { emoji: "🧸", symbol: "🧸", label: "Teddy", type: "toy", correctZone: "bed", startPos: { x: 20, y: 25 } }
                 ],
                 zones: [
                     { id: "wardrobe", name: "Kleiderschrank", x: 80, y: 20, w: 15, h: 30, accepts: ["clothing"] },
@@ -28,12 +28,12 @@ class AufraumSpiel {
             kitchen: {
                 title: "🍳 Küche",
                 items: [
-                    { emoji: "🍽️", label: "Teller", type: "dishes", correctZone: "cabinet", startPos: { x: 30, y: 30 } },
-                    { emoji: "🍴", label: "Gabel", type: "utensils", correctZone: "cabinet", startPos: { x: 25, y: 70 } },
-                    { emoji: "🍳", label: "Pfanne", type: "cookware", correctZone: "stove", startPos: { x: 60, y: 40 } },
-                    { emoji: "☕", label: "Tasse", type: "dishes", correctZone: "cabinet", startPos: { x: 35, y: 50 } },
-                    { emoji: "🧽", label: "Schwamm", type: "cleaning", correctZone: "sink", startPos: { x: 50, y: 80 } },
-                    { emoji: "🧴", label: "Spülmittel", type: "cleaning", correctZone: "sink", startPos: { x: 80, y: 75 } }
+                    { emoji: "🍽️", symbol: "🍽️", label: "Teller", type: "dishes", correctZone: "cabinet", startPos: { x: 30, y: 30 } },
+                    { emoji: "🍴", symbol: "🍴", label: "Gabel", type: "utensils", correctZone: "cabinet", startPos: { x: 25, y: 70 } },
+                    { emoji: "🍳", symbol: "🍳", label: "Pfanne", type: "cookware", correctZone: "stove", startPos: { x: 60, y: 40 } },
+                    { emoji: "☕", symbol: "☕", label: "Tasse", type: "dishes", correctZone: "cabinet", startPos: { x: 35, y: 50 } },
+                    { emoji: "🧽", symbol: "🧽", label: "Schwamm", type: "cleaning", correctZone: "sink", startPos: { x: 50, y: 80 } },
+                    { emoji: "🧴", symbol: "🧴", label: "Spülmittel", type: "cleaning", correctZone: "sink", startPos: { x: 80, y: 75 } }
                 ],
                 zones: [
                     { id: "cabinet", name: "Küchenschrank", x: 75, y: 25, w: 20, h: 30, accepts: ["dishes", "utensils"] },
@@ -44,13 +44,13 @@ class AufraumSpiel {
             bathroom: {
                 title: "🛁 Badezimmer",
                 items: [
-                    { emoji: "🧴", label: "Shampoo", type: "hygiene", correctZone: "shower", startPos: { x: 25, y: 30 } },
-                    { emoji: "🧽", label: "Seife", type: "hygiene", correctZone: "sink", startPos: { x: 60, y: 80 } },
-                    { emoji: "🪥", label: "Zahnbürste", type: "dental", correctZone: "sink", startPos: { x: 40, y: 25 } },
-                    { emoji: "🧻", label: "Toilettenpapier", type: "toilet", correctZone: "toilet", startPos: { x: 70, y: 45 } },
-                    { emoji: "🛁", label: "Handtuch", type: "towels", correctZone: "towel-rack", startPos: { x: 35, y: 60 } },
-                    { emoji: "💊", label: "Medikamente", type: "medicine", correctZone: "cabinet", startPos: { x: 50, y: 40 } },
-                    { emoji: "🪒", label: "Rasierer", type: "hygiene", correctZone: "cabinet", startPos: { x: 80, y: 30 } }
+                    { emoji: "🧴", symbol: "🧴", label: "Shampoo", type: "hygiene", correctZone: "shower", startPos: { x: 25, y: 30 } },
+                    { emoji: "🧽", symbol: "🧽", label: "Seife", type: "hygiene", correctZone: "sink", startPos: { x: 60, y: 80 } },
+                    { emoji: "🪥", symbol: "🪥", label: "Zahnbürste", type: "dental", correctZone: "sink", startPos: { x: 40, y: 25 } },
+                    { emoji: "🧻", symbol: "🧻", label: "Toilettenpapier", type: "toilet", correctZone: "toilet", startPos: { x: 70, y: 45 } },
+                    { emoji: "🛁", symbol: "🛁", label: "Handtuch", type: "towels", correctZone: "towel-rack", startPos: { x: 35, y: 60 } },
+                    { emoji: "💊", symbol: "💊", label: "Medikamente", type: "medicine", correctZone: "cabinet", startPos: { x: 50, y: 40 } },
+                    { emoji: "🪒", symbol: "🪒", label: "Rasierer", type: "hygiene", correctZone: "cabinet", startPos: { x: 80, y: 30 } }
                 ],
                 zones: [
                     { id: "shower", name: "Dusche", x: 15, y: 20, w: 20, h: 25, accepts: ["hygiene"] },
@@ -63,20 +63,76 @@ class AufraumSpiel {
             kids_room: {
                 title: "🧸 Kinderzimmer",
                 items: [
-                    { emoji: "🧸", label: "Teddybär", type: "toy", correctZone: "toybox", startPos: { x: 30, y: 30 } },
-                    { emoji: "🚗", label: "Spielzeugauto", type: "toy", correctZone: "toybox", startPos: { x: 45, y: 70 } },
-                    { emoji: "🎨", label: "Malstifte", type: "art", correctZone: "desk", startPos: { x: 25, y: 50 } },
-                    { emoji: "📚", label: "Bilderbuch", type: "books", correctZone: "shelf", startPos: { x: 70, y: 35 } },
-                    { emoji: "🧩", label: "Puzzle", type: "toy", correctZone: "toybox", startPos: { x: 55, y: 25 } },
-                    { emoji: "👕", label: "Kindershirt", type: "clothing", correctZone: "wardrobe", startPos: { x: 80, y: 60 } },
-                    { emoji: "🎒", label: "Schulranzen", type: "school", correctZone: "shelf", startPos: { x: 35, y: 75 } },
-                    { emoji: "🏀", label: "Ball", type: "sport", correctZone: "toybox", startPos: { x: 60, y: 80 } }
+                    { emoji: "🧸", symbol: "🧸", label: "Teddybär", type: "toy", correctZone: "toybox", startPos: { x: 30, y: 30 } },
+                    { emoji: "🚗", symbol: "🚗", label: "Spielzeugauto", type: "toy", correctZone: "toybox", startPos: { x: 45, y: 70 } },
+                    { emoji: "🎨", symbol: "🎨", label: "Malstifte", type: "art", correctZone: "desk", startPos: { x: 25, y: 50 } },
+                    { emoji: "📚", symbol: "📚", label: "Bilderbuch", type: "books", correctZone: "shelf", startPos: { x: 70, y: 35 } },
+                    { emoji: "🧩", symbol: "🧩", label: "Puzzle", type: "toy", correctZone: "toybox", startPos: { x: 55, y: 25 } },
+                    { emoji: "👕", symbol: "👕", label: "Kindershirt", type: "clothing", correctZone: "wardrobe", startPos: { x: 80, y: 60 } },
+                    { emoji: "🎒", symbol: "🎒", label: "Schulranzen", type: "school", correctZone: "shelf", startPos: { x: 35, y: 75 } },
+                    { emoji: "🏀", symbol: "🏀", label: "Ball", type: "sport", correctZone: "toybox", startPos: { x: 60, y: 80 } }
                 ],
                 zones: [
                     { id: "toybox", name: "Spielzeugkiste", x: 75, y: 70, w: 20, h: 25, accepts: ["toy", "sport"] },
                     { id: "desk", name: "Schreibtisch", x: 15, y: 40, w: 25, h: 20, accepts: ["art", "school"] },
                     { id: "shelf", name: "Regal", x: 45, y: 25, w: 15, h: 30, accepts: ["books", "school"] },
                     { id: "wardrobe", name: "Kinderschrank", x: 70, y: 40, w: 18, h: 25, accepts: ["clothing"] }
+                ]
+            },
+            garden: {
+                title: "🌻 Garten",
+                items: [
+                    { emoji: "🌱", symbol: "🌱", label: "Blumentopf", type: "plants", correctZone: "greenhouse", startPos: { x: 25, y: 30 } },
+                    { emoji: "🔧", symbol: "🔧", label: "Schaufel", type: "tools", correctZone: "shed", startPos: { x: 60, y: 80 } },
+                    { emoji: "🪣", symbol: "🪣", label: "Gießkanne", type: "watering", correctZone: "greenhouse", startPos: { x: 40, y: 25 } },
+                    { emoji: "🧤", symbol: "🧤", label: "Gartenhandschuhe", type: "clothing", correctZone: "shed", startPos: { x: 70, y: 45 } },
+                    { emoji: "🪴", symbol: "🪴", label: "Gartenschlauch", type: "watering", correctZone: "storage", startPos: { x: 35, y: 60 } },
+                    { emoji: "⚽", symbol: "⚽", label: "Fußball", type: "sport", correctZone: "storage", startPos: { x: 50, y: 40 } },
+                    { emoji: "🗞️", symbol: "🗞️", label: "Zeitungen", type: "waste", correctZone: "compost", startPos: { x: 80, y: 30 } },
+                    { emoji: "🍂", symbol: "🍂", label: "Blätter", type: "waste", correctZone: "compost", startPos: { x: 20, y: 75 } }
+                ],
+                zones: [
+                    { id: "greenhouse", name: "Gewächshaus", x: 15, y: 20, w: 25, h: 25, accepts: ["plants", "watering"] },
+                    { id: "shed", name: "Geräteschuppen", x: 65, y: 60, w: 20, h: 25, accepts: ["tools", "clothing"] },
+                    { id: "storage", name: "Aufbewahrung", x: 40, y: 50, w: 20, h: 20, accepts: ["watering", "sport"] },
+                    { id: "compost", name: "Kompost", x: 75, y: 25, w: 18, h: 20, accepts: ["waste"] }
+                ]
+            },
+            garage: {
+                title: "🚗 Garage",
+                items: [
+                    { emoji: "🔧", symbol: "🔧", label: "Schraubenschlüssel", type: "tools", correctZone: "workbench", startPos: { x: 30, y: 30 } },
+                    { emoji: "🛞", symbol: "🛞", label: "Autoreifen", type: "car", correctZone: "storage", startPos: { x: 45, y: 70 } },
+                    { emoji: "🔩", symbol: "🔩", label: "Schrauben", type: "hardware", correctZone: "workbench", startPos: { x: 25, y: 50 } },
+                    { emoji: "🧽", symbol: "🧽", label: "Autopflegemittel", type: "cleaning", correctZone: "shelf", startPos: { x: 70, y: 35 } },
+                    { emoji: "📦", symbol: "📦", label: "Kartons", type: "storage", correctZone: "storage", startPos: { x: 55, y: 25 } },
+                    { emoji: "🔌", symbol: "🔌", label: "Verlängerungskabel", type: "electrical", correctZone: "workbench", startPos: { x: 80, y: 60 } },
+                    { emoji: "🚲", symbol: "�", label: "Fahrrad", type: "vehicle", correctZone: "parking", startPos: { x: 35, y: 75 } },
+                    { emoji: "🧥", symbol: "🧥", label: "Arbeitsjacke", type: "clothing", correctZone: "shelf", startPos: { x: 60, y: 80 } }
+                ],
+                zones: [
+                    { id: "workbench", name: "Werkbank", x: 15, y: 40, w: 25, h: 25, accepts: ["tools", "hardware", "electrical"] },
+                    { id: "storage", name: "Lagerbereich", x: 50, y: 20, w: 20, h: 30, accepts: ["car", "storage"] },
+                    { id: "shelf", name: "Regal", x: 75, y: 45, w: 18, h: 30, accepts: ["cleaning", "clothing"] },
+                    { id: "parking", name: "Stellplatz", x: 40, y: 65, w: 25, h: 25, accepts: ["vehicle"] }
+                ]
+            },
+            balcony: {
+                title: "🌿 Balkon",
+                items: [
+                    { emoji: "🌺", symbol: "🌺", label: "Blumen", type: "plants", correctZone: "planters", startPos: { x: 30, y: 30 } },
+                    { emoji: "☂️", symbol: "☂️", label: "Sonnenschirm", type: "furniture", correctZone: "storage", startPos: { x: 45, y: 70 } },
+                    { emoji: "🪑", symbol: "🪑", label: "Stuhl", type: "furniture", correctZone: "seating", startPos: { x: 25, y: 50 } },
+                    { emoji: "📰", symbol: "📰", label: "Zeitschriften", type: "reading", correctZone: "table", startPos: { x: 70, y: 35 } },
+                    { emoji: "🕯️", symbol: "🕯️", label: "Kerzen", type: "decoration", correctZone: "table", startPos: { x: 55, y: 25 } },
+                    { emoji: "🧹", symbol: "🧹", label: "Besen", type: "cleaning", correctZone: "storage", startPos: { x: 80, y: 60 } },
+                    { emoji: "⚽", symbol: "⚽", label: "Spielball", type: "sport", correctZone: "storage", startPos: { x: 35, y: 75 } }
+                ],
+                zones: [
+                    { id: "planters", name: "Pflanzgefäße", x: 15, y: 25, w: 20, h: 30, accepts: ["plants"] },
+                    { id: "seating", name: "Sitzbereich", x: 40, y: 40, w: 25, h: 25, accepts: ["furniture"] },
+                    { id: "table", name: "Tisch", x: 70, y: 50, w: 15, h: 20, accepts: ["reading", "decoration"] },
+                    { id: "storage", name: "Aufbewahrung", x: 75, y: 70, w: 20, h: 25, accepts: ["furniture", "cleaning", "sport"] }
                 ]
             }
         };
@@ -144,6 +200,13 @@ class AufraumSpiel {
         this.totalItems = roomData.items.length;
 
         document.getElementById('current-room-title').textContent = roomData.title;
+
+        // Setze den thematischen Hintergrund
+        const roomContainer = document.querySelector('.room-3d');
+        if (roomContainer) {
+            // Entferne alle alten Raum-Klassen
+            roomContainer.className = 'room-3d ' + roomType;
+        }
 
         this.setupRoom(roomData);
         this.updateDisplay();
@@ -214,10 +277,12 @@ class AufraumSpiel {
             itemDiv.dataset.startX = item.startPos.x;
             itemDiv.dataset.startY = item.startPos.y;
 
-            // Emoji
+            // Robuste Icon-Darstellung mit Unicode-Symbolen
             const emoji = document.createElement('div');
             emoji.className = 'item-emoji';
-            emoji.textContent = item.emoji;
+            emoji.textContent = item.emoji; // Verwende die einfachen Unicode-Symbole
+            emoji.setAttribute('data-item-type', item.type);
+            emoji.setAttribute('data-label', item.label);
 
             // Label
             const label = document.createElement('div');

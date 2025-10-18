@@ -3,13 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Aufräum-Spiel</title>
+    <title>Aufräum-Spiel</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Web Font für bessere Symbol-Unterstützung -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=Segoe+UI+Symbol&display=swap" rel="stylesheet">
+    <style>
+        .emoji-font {
+            font-family: 'Noto Color Emoji', 'Segoe UI Symbol', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+        }
+    </style>
 </head>
 <body>
     <div class="game-container">
         <header>
-            <h1>🏠 3D Aufräum-Spiel</h1>
+            <h1>😑 3D Aufräum-Spiel</h1>
             <div class="score-board">
                 <span>Punkte: <span id="score">0</span></span>
                 <span>Aufgeräumt: <span id="cleaned-items">0</span>/<span id="total-items">0</span></span>
@@ -44,6 +51,24 @@
                 <div class="room-name">Kinderzimmer</div>
                 <div class="room-description">Spielzeug und Schulsachen aufräumen</div>
             </button>
+
+            <button class="room-btn" data-room="garden">
+                <div class="room-icon">🌻</div>
+                <div class="room-name">Garten</div>
+                <div class="room-description">Pflanzen und Gartengeräte ordnen</div>
+            </button>
+
+            <button class="room-btn" data-room="garage">
+                <div class="room-icon">🚗</div>
+                <div class="room-name">Garage</div>
+                <div class="room-description">Werkzeuge und Fahrzeuge organisieren</div>
+            </button>
+
+            <button class="room-btn" data-room="balcony">
+                <div class="room-icon">🌿</div>
+                <div class="room-name">Balkon</div>
+                <div class="room-description">Möbel und Pflanzen arrangieren</div>
+            </button>
         </div>
             </div>
 
@@ -57,6 +82,11 @@
 
                 <!-- 3D Raum mit Drag & Drop -->
                 <div class="room-3d">
+                    <!-- Dekorative Elemente -->
+                    <div class="window">
+                        <div class="window-vase"></div>
+                    </div>
+
                     <!-- Wände und Möbel -->
                     <div class="room-walls">
                         <div class="wall back-wall"></div>
