@@ -49,6 +49,93 @@ header h1 {
     padding: 30px;
 }
 
+/* Level-Auswahl Styles */
+.level-selector {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    margin: 20px;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.level-selector h3 {
+    margin-bottom: 15px;
+    color: #2d3436;
+    font-size: 1.3em;
+}
+
+.level-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.level-btn {
+    background: linear-gradient(135deg, #ddd6fe, #c4b5fd);
+    border: 3px solid transparent;
+    padding: 15px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1em;
+    font-weight: bold;
+    color: #4c1d95;
+    min-width: 120px;
+}
+
+.level-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+.level-btn.active {
+    border-color: #7c3aed;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white;
+    box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
+}
+
+.level-btn small {
+    display: block;
+    font-size: 0.8em;
+    opacity: 0.8;
+    margin-top: 3px;
+}
+
+/* Level-spezifische Item-Styles */
+.helper-border {
+    animation: pulse-helper 2s infinite;
+}
+
+@keyframes pulse-helper {
+    0% {
+        box-shadow: 0 0 10px rgba(255, 235, 59, 0.7);
+        border-color: #ffeb3b;
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 235, 59, 1);
+        border-color: #fdd835;
+    }
+    100% {
+        box-shadow: 0 0 10px rgba(255, 235, 59, 0.7);
+        border-color: #ffeb3b;
+    }
+}
+
+/* Level-spezifische Raum-Styles */
+.room-3d.level-0 {
+    filter: brightness(1.1) contrast(1.1);
+}
+
+.room-3d.level-2 {
+    filter: brightness(0.95) contrast(1.05);
+}
+
+.room-3d.level-3 {
+    filter: brightness(0.9) saturate(1.1);
+}
+
 .screen.active {
     display: block;
 }

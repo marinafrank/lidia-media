@@ -16,14 +16,26 @@
 <body>
     <div class="game-container">
         <header>
-            <h1>😑 3D Aufräum-Spiel</h1>
+            <h1>🎮 3D Aufräum-Spiel</h1>
             <div class="score-board">
                 <span>Punkte: <span id="score">0</span></span>
                 <span>Aufgeräumt: <span id="cleaned-items">0</span>/<span id="total-items">0</span></span>
+                <span id="current-level">Level: 🟡 Normal</span>
             </div>
         </header>
 
         <main>
+            <!-- Level-Auswahl -->
+            <div class="level-selector">
+                <h3>Schwierigkeitsgrad wählen:</h3>
+                <div class="level-buttons">
+                    <button class="level-btn active" data-level="0">🟢 Einfach<br><small>Farbige Hilfen</small></button>
+                    <button class="level-btn" data-level="1">🟡 Normal<br><small>Standard</small></button>
+                    <button class="level-btn" data-level="2">🟠 Schwer<br><small>Mehr Items</small></button>
+                    <button class="level-btn" data-level="3">🔴 Experte<br><small>Doppelte Items</small></button>
+                </div>
+            </div>
+
             <!-- Raumauswahl -->
             <div id="room-selection" class="screen active">
                 <h2>Welchen Raum möchtest du erkunden?</h2>

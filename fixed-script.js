@@ -7,6 +7,8 @@ class AufraumSpiel {
         this.isDragging = false;
         this.dragOffset = { x: 0, y: 0 };
         this.activeElement = null;
+        this.currentLevel = 1; // Standard Level
+        this.maxLevel = 3;
 
         this.roomData = {
             bedroom: {
@@ -141,6 +143,18 @@ class AufraumSpiel {
     }
 
     init() {
+        // Event Listeners für Level-Auswahl
+        document.querySelectorAll('.level-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const selectedLevel = parseInt(e.currentTarget.dataset.level);
+                this.setLevel(selectedLevel);
+
+                // UI Update für aktiven Level-Button
+                document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+            });
+        });
+
         // Event Listeners für Raumauswahl
         document.querySelectorAll('.room-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -197,20 +211,40 @@ class AufraumSpiel {
         this.cleanedItems = 0;
 
         const roomData = this.roomData[roomType];
-        this.totalItems = roomData.items.length;
+        // Verwende Level-spezifische Items
+        const levelItems = this.getLevelItems(roomType);
+        this.totalItems = levelItems.length;
 
-        document.getElementById('current-room-title').textContent = roomData.title;
+        // Erstelle temporäre Room-Daten mit Level-Items und Level-Zonen
+        const levelZones = this.getLevelZones(roomType);
+        const levelRoomData = {
+            ...roomData,
+            items: levelItems,
+            zones: levelZones
+        };
+
+        document.getElementById('current-room-title').textContent = `${roomData.title} - ${this.getLevelName()}`;
 
         // Setze den thematischen Hintergrund
         const roomContainer = document.querySelector('.room-3d');
         if (roomContainer) {
-            // Entferne alle alten Raum-Klassen
-            roomContainer.className = 'room-3d ' + roomType;
+            // Entferne alle alten Raum-Klassen und füge Level-Klasse hinzu
+            roomContainer.className = `room-3d ${roomType} level-${this.currentLevel}`;
         }
 
-        this.setupRoom(roomData);
+        this.setupRoom(levelRoomData);
         this.updateDisplay();
         this.showScreen('game-area');
+    }
+
+    getLevelName() {
+        const levelNames = {
+            0: "🟢 Einfach",
+            1: "🟡 Normal",
+            2: "🟠 Schwer",
+            3: "🔴 Experte"
+        };
+        return levelNames[this.currentLevel];
     }
 
     setupRoom(roomData) {
@@ -267,40 +301,58 @@ class AufraumSpiel {
         if (!container) return;
 
         items.forEach((item, index) => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'draggable-item';
-            itemDiv.id = `item-${index}`;
-            itemDiv.style.left = `${item.startPos.x}%`;
-            itemDiv.style.top = `${item.startPos.y}%`;
-            itemDiv.dataset.itemType = item.type;
-            itemDiv.dataset.correctZone = item.correctZone;
-            itemDiv.dataset.startX = item.startPos.x;
-            itemDiv.dataset.startY = item.startPos.y;
+            // Für doppelte Items in Level 3 mehrere erstellen
+            const itemCount = item.isDuplicate ? item.duplicateCount : 1;
 
-            // Robuste Icon-Darstellung mit Unicode-Symbolen
-            const emoji = document.createElement('div');
-            emoji.className = 'item-emoji';
-            emoji.textContent = item.emoji; // Verwende die einfachen Unicode-Symbole
-            emoji.setAttribute('data-item-type', item.type);
-            emoji.setAttribute('data-label', item.label);
+            for (let copy = 0; copy < itemCount; copy++) {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'draggable-item';
+                itemDiv.id = `item-${index}-${copy}`;
 
-            // Label
-            const label = document.createElement('div');
-            label.className = 'item-label';
-            label.textContent = item.label;
+                // Für Duplikate verschiedene Positionen
+                const posX = copy === 0 ? item.startPos.x : Math.random() * 80 + 10;
+                const posY = copy === 0 ? item.startPos.y : Math.random() * 80 + 10;
 
-            itemDiv.appendChild(emoji);
-            itemDiv.appendChild(label);
+                itemDiv.style.left = `${posX}%`;
+                itemDiv.style.top = `${posY}%`;
+                itemDiv.dataset.itemType = item.type;
+                itemDiv.dataset.correctZone = item.correctZone;
+                itemDiv.dataset.startX = posX;
+                itemDiv.dataset.startY = posY;
+                itemDiv.dataset.isDuplicate = item.isDuplicate || false;
 
-            // Mouse Events - Einfaches Drag-and-Drop ohne HTML5 Drag API
-            itemDiv.addEventListener('mousedown', (e) => {
-                if (itemDiv.classList.contains('placed')) return;
+                // Level 0: Farbige Umrandung als Hilfe
+                if (this.currentLevel === 0 && item.hasHelper) {
+                    itemDiv.classList.add('helper-border');
+                    itemDiv.style.border = '3px solid #ffeb3b';
+                    itemDiv.style.boxShadow = '0 0 10px rgba(255, 235, 59, 0.7)';
+                }
 
-                e.preventDefault();
-                this.startDrag(itemDiv, e);
-            });
+                // Robuste Icon-Darstellung mit Unicode-Symbolen
+                const emoji = document.createElement('div');
+                emoji.className = 'item-emoji';
+                emoji.textContent = item.emoji;
+                emoji.setAttribute('data-item-type', item.type);
+                emoji.setAttribute('data-label', item.label);
 
-            container.appendChild(itemDiv);
+                // Label mit Duplikat-Info
+                const label = document.createElement('div');
+                label.className = 'item-label';
+                label.textContent = item.isDuplicate ? `${item.label} (${copy + 1}/${itemCount})` : item.label;
+
+                itemDiv.appendChild(emoji);
+                itemDiv.appendChild(label);
+
+                // Mouse Events - Einfaches Drag-and-Drop ohne HTML5 Drag API
+                itemDiv.addEventListener('mousedown', (e) => {
+                    if (itemDiv.classList.contains('placed')) return;
+
+                    e.preventDefault();
+                    this.startDrag(itemDiv, e);
+                });
+
+                container.appendChild(itemDiv);
+            }
         });
 
         // Global mouse events
@@ -500,6 +552,106 @@ class AufraumSpiel {
         setTimeout(() => {
             this.showScreen('success-screen');
         }, 2000);
+    }
+
+    // Level System Methods
+    setLevel(level) {
+        this.currentLevel = Math.max(0, Math.min(level, 3));
+        this.updateLevelDisplay();
+    }
+
+    updateLevelDisplay() {
+        const levelNames = {
+            0: "🟢 Einfach",
+            1: "🟡 Normal",
+            2: "🟠 Schwer",
+            3: "🔴 Experte"
+        };
+
+        const levelElement = document.getElementById('current-level');
+        if (levelElement) {
+            levelElement.textContent = `Level: ${levelNames[this.currentLevel]}`;
+        }
+    }
+
+    getLevelItems(roomKey) {
+        const baseItems = this.roomData[roomKey].items;
+
+        switch (this.currentLevel) {
+            case 0: // Einfach - weniger Items, farbige Umrandungen
+                return baseItems.slice(0, 3).map(item => ({
+                    ...item,
+                    hasHelper: true // Für farbige Umrandung
+                }));
+
+            case 1: // Normal - Standard
+                return baseItems;
+
+            case 2: // Schwer - mehr Items, verstecktere Positionen
+                return this.getHardLevelItems(baseItems);
+
+            case 3: // Experte - doppelte Items + zusätzliche
+                return this.getExpertLevelItems(baseItems);
+
+            default:
+                return baseItems;
+        }
+    }
+
+    getHardLevelItems(baseItems) {
+        // Füge 2-3 zusätzliche Items hinzu für Level 2
+        const extraItems = [
+            { emoji: "🗃️", symbol: "🗃️", label: "Box", type: "storage", correctZone: "storage", startPos: { x: 15, y: 85 } },
+            { emoji: "🧹", symbol: "🧹", label: "Besen", type: "cleaning", correctZone: "storage", startPos: { x: 85, y: 15 } },
+            { emoji: "🧴", symbol: "🧴", label: "Reiniger", type: "cleaning", correctZone: "storage", startPos: { x: 10, y: 10 } }
+        ];
+
+        // Versteckte Positionen (näher an den Rändern)
+        const hiddenItems = baseItems.map(item => ({
+            ...item,
+            startPos: {
+                x: Math.random() < 0.5 ? Math.random() * 15 + 5 : Math.random() * 15 + 80,
+                y: Math.random() < 0.5 ? Math.random() * 15 + 5 : Math.random() * 15 + 80
+            }
+        }));
+
+        return [...hiddenItems, ...extraItems.slice(0, 2)];
+    }
+
+    getLevelZones(roomKey) {
+        const baseZones = this.roomData[roomKey].zones;
+
+        if (this.currentLevel >= 2) {
+            // Füge zusätzliche Storage-Zone für Level 2+ hinzu
+            const extraZones = [
+                { id: "storage", name: "Lager", x: 5, y: 5, w: 15, h: 15, accepts: ["storage", "cleaning"] },
+                { id: "entrance", name: "Eingang", x: 85, y: 85, w: 10, h: 10, accepts: ["shoes", "important"] }
+            ];
+            return [...baseZones, ...extraZones];
+        }
+
+        return baseZones;
+    }
+
+    getExpertLevelItems(baseItems) {
+        // Erstelle doppelte Items für Level 3
+        const doubleItems = baseItems.slice(0, 3).map((item, index) => ({
+            ...item,
+            id: `${item.label}_copy_${index}`,
+            label: `${item.label} (2x)`,
+            isDuplicate: true,
+            duplicateCount: 2,
+            startPos: { x: Math.random() * 80 + 10, y: Math.random() * 80 + 10 }
+        }));
+
+        // Zusätzliche schwierige Items
+        const expertItems = [
+            { emoji: "🥾", symbol: "🥾", label: "Gummistiefel", type: "shoes", correctZone: "entrance", startPos: { x: 12, y: 88 } },
+            { emoji: "🧳", symbol: "🧳", label: "Koffer", type: "storage", correctZone: "storage", startPos: { x: 88, y: 12 } },
+            { emoji: "🔑", symbol: "🔑", label: "Schlüssel", type: "important", correctZone: "desk", startPos: { x: 45, y: 92 } }
+        ];
+
+        return [...baseItems, ...doubleItems, ...expertItems];
     }
 }
 
