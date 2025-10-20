@@ -255,93 +255,18 @@ class AufraumSpiel {
         this.showScreen('game-area');
     }
 
-    getLevelName() {
-        const levelNames = {
-            0: "🟢 Einfach",
-            1: "🟡 Normal",
-            2: "🟠 Schwer",
-            3: "🔴 Experte"
-        };
-        return levelNames[this.currentLevel];
-    }
-
-    // Mobile Detection
-    detectMobile() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-               ('ontouchstart' in window) ||
-               (navigator.maxTouchPoints > 0);
-    }
-
-    // Mobile Click-to-Select System
-    selectItem(itemElement) {
-        console.log('Selecting item:', itemElement.querySelector('.item-label').textContent); // Debug
-
-        // Deselect previously selected item
-        if (this.selectedItem) {
-            this.selectedItem.classList.remove('selected');
-        }
-
-        // Select new item
-        this.selectedItem = itemElement;
-        itemElement.classList.add('selected');
-
-        console.log('Item selected. Correct zone:', itemElement.dataset.correctZone); // Debug
-
-        // Show instruction message
-        this.showMobileInstruction();
-    }
-
-    deselectItem() {
-        if (this.selectedItem) {
-            this.selectedItem.classList.remove('selected');
-            this.selectedItem = null;
-            this.hideMobileInstruction();
-        }
-    }
-
-    showMobileInstruction() {
-        let instruction = document.getElementById('mobile-instruction');
-        if (!instruction) {
-            instruction = document.createElement('div');
-            instruction.id = 'mobile-instruction';
-            instruction.className = 'mobile-instruction';
-
-            // Suche nach verfügbaren Containern
-            const gameArea = document.getElementById('game-area') ||
-                           document.querySelector('.room-3d') ||
-                           document.body;
-            gameArea.appendChild(instruction);
-        }
-
-        // Zeige verfügbare Zonen für das ausgewählte Item
-        const itemType = this.selectedItem.dataset.itemType;
-        const correctZone = this.selectedItem.dataset.correctZone;
-        instruction.innerHTML = `📱 Tippe auf <strong>${this.getZoneName(correctZone)}</strong> um "${this.selectedItem.querySelector('.item-label').textContent}" zu platzieren!`;
-        instruction.style.display = 'block';
-
-        // Markiere die richtige Zone nur auf einfachstem Level (Level 0)
-        if (this.currentLevel === 0) {
-            this.highlightCorrectZone(correctZone);
-        }
-    }
-
+    // Liefert den sichtbaren Namen einer Zone anhand der zoneId
     getZoneName(zoneId) {
-        const zoneElement = document.querySelector(`[data-zone-id="${zoneId}"]`);
-        if (zoneElement) {
-            const label = document.querySelector(`.furniture-label`);
-            // Finde das richtige Label basierend auf Position
-            const labels = document.querySelectorAll('.furniture-label');
-            for (let label of labels) {
-                const labelText = label.textContent.toLowerCase();
-                if (zoneId.includes('wardrobe') && labelText.includes('schrank')) return label.textContent;
-                if (zoneId.includes('desk') && labelText.includes('schreibtisch')) return label.textContent;
-                if (zoneId.includes('bed') && labelText.includes('bett')) return label.textContent;
-                if (zoneId.includes('cabinet') && labelText.includes('schrank')) return label.textContent;
-                if (zoneId.includes('sink') && (labelText.includes('spüle') || labelText.includes('waschbecken'))) return label.textContent;
-                if (zoneId.includes('storage') && labelText.includes('lager')) return label.textContent;
+        const z = document.querySelector(`[data-zone-id="${zoneId}"]`);
+        if (z) return z.dataset.zoneName || z.getAttribute('data-zone-name') || z.textContent || zoneId;
+        // Fallback zum roomData
+        for (const roomKey in this.roomData) {
+            const zones = this.roomData[roomKey].zones || [];
+            for (const zone of zones) {
+                if (zone.id === zoneId) return zone.name;
             }
         }
-        return zoneId; // Fallback
+        return zoneId;
     }
 
     highlightCorrectZone(correctZoneId) {
@@ -469,34 +394,33 @@ class AufraumSpiel {
         if (!container) return;
 
         zones.forEach(zone => {
+            // Berechne Top-Koordinate, aber clamp in obere Hälfte
+            const topPercent = Math.min(zone.y, 45);
+
             // Drop Zone
             const dropZone = document.createElement('div');
             dropZone.className = 'drop-zone';
             dropZone.id = `zone-${zone.id}`;
             dropZone.style.left = `${zone.x}%`;
-            dropZone.style.top = `${zone.y}%`;
+            dropZone.style.top = `${topPercent}%`;
             dropZone.style.width = `${zone.w}%`;
             dropZone.style.height = `${zone.h}%`;
             dropZone.dataset.zoneId = zone.id;
             dropZone.dataset.accepts = zone.accepts.join(',');
 
-            // Universal Click Handler für Zonen (Mobile & Desktop)
+            // Click / touch handlers
             dropZone.addEventListener('click', (e) => {
-                if (this.selectedItem) {  // Vereinfacht - checke nur ob Item ausgewählt
+                if (this.selectedItem) {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Zone clicked:', dropZone.dataset.zoneId, 'Mobile:', this.isMobile); // Debug
                     this.handleZoneClick(dropZone);
                 }
             });
 
-            // Touch Events für mobile Zonen
             dropZone.addEventListener('touchstart', (e) => {
                 if (this.selectedItem) {
                     e.preventDefault();
-                    // Visueller Feedback
-                    dropZone.style.backgroundColor = 'rgba(0, 123, 255, 0.3)';
-                    console.log('Zone touch start:', dropZone.dataset.zoneId); // Debug
+                    dropZone.style.backgroundColor = 'rgba(0,123,255,0.25)';
                 }
             });
 
@@ -504,71 +428,55 @@ class AufraumSpiel {
                 if (this.selectedItem) {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Zone touched:', dropZone.dataset.zoneId); // Debug
                     this.handleZoneClick(dropZone);
-                    // Reset visual feedback
-                    setTimeout(() => {
-                        dropZone.style.backgroundColor = '';
-                    }, 200);
+                    setTimeout(() => { dropZone.style.backgroundColor = ''; }, 200);
                 }
             });
 
             container.appendChild(dropZone);
 
-            // Erstelle Button anstatt Label für bessere Klickbarkeit
+            // Label/Button oberhalb der Zone
             const label = document.createElement('button');
             label.className = 'furniture-label furniture-button';
             label.textContent = zone.name;
             label.type = 'button';
             label.style.position = 'absolute';
             label.style.left = `${zone.x + zone.w/2}%`;
-            label.style.top = `${zone.y - 8}%`;
+            label.style.top = `${topPercent - 8}%`;
             label.style.transform = 'translateX(-50%)';
             label.style.zIndex = '999';
             label.style.pointerEvents = 'auto';
             label.style.cursor = 'pointer';
             label.dataset.zoneId = zone.id;
 
-            console.log('Creating BUTTON:', zone.name, 'with zone ID:', zone.id);            // Bessere Mobile-Sichtbarkeit
             if (this.isMobile) {
-                label.style.fontSize = '1.2em';
-                label.style.padding = '12px 16px';
-                label.style.minWidth = '100px';
-                label.style.minHeight = '40px';
-                label.style.borderRadius = '10px';
+                label.style.fontSize = '1.1em';
+                label.style.padding = '10px 14px';
+                label.style.borderRadius = '8px';
                 label.style.border = '2px solid rgba(255,255,255,0.6)';
             }
 
-            // Einfacher, direkter Click-Handler
-            const self = this; // Referenz für den Event-Handler
-
-            label.onclick = function(e) {
-                console.log('� BUTTON CLICKED:', zone.name, 'Selected item:', !!self.selectedItem);
-
-                if (self.selectedItem) {
-                    console.log('👍 Processing zone click...');
-                    self.handleZoneClick(dropZone);
-                } else {
-                    console.log('❌ No item selected');
-                    alert('Bitte wähle zuerst einen Gegenstand aus!');
-                }
-
+            const self = this;
+            label.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                return false;
-            };
-
-            // Touch Support
-            label.addEventListener('touchend', function(e) {
-                console.log('📱 BUTTON TOUCHED:', zone.name);
-                e.preventDefault();
-
                 if (self.selectedItem) {
                     self.handleZoneClick(dropZone);
                 } else {
                     alert('Bitte wähle zuerst einen Gegenstand aus!');
                 }
-            });            container.appendChild(label);
+                return false;
+            });
+            label.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                if (self.selectedItem) {
+                    self.handleZoneClick(dropZone);
+                } else {
+                    alert('Bitte wähle zuerst einen Gegenstand aus!');
+                }
+            });
+
+            container.appendChild(label);
         });
     }
 
@@ -707,7 +615,7 @@ class AufraumSpiel {
                 console.log('📦 Placing item in zone:', zone.id);
                 this.handleZoneClick(element);
             } else {
-                alert('Bitte wähle zuerst einen Gegenstand!');
+                this.showMessage('❌ Bitte wähle zuerst einen Gegenstand!', 'error');
             }
             e.stopPropagation();
         };
@@ -738,9 +646,9 @@ class AufraumSpiel {
                 itemDiv.className = 'draggable-item';
                 itemDiv.id = `item-${index}-${copy}`;
 
-                // Für Duplikate verschiedene Positionen
-                const posX = copy === 0 ? item.startPos.x : Math.random() * 80 + 10;
-                const posY = copy === 0 ? item.startPos.y : Math.random() * 80 + 10;
+                // Platziere Items in der unteren Hälfte (55% - 90%) für zu räumende Gegenstände
+                const posX = copy === 0 ? item.startPos.x : Math.random() * 70 + 15; // 15% - 85%
+                const posY = copy === 0 ? Math.max(item.startPos.y, 55) : Math.random() * 35 + 55; // 55% - 90%
 
                 itemDiv.style.left = `${posX}%`;
                 itemDiv.style.top = `${posY}%`;
@@ -963,6 +871,52 @@ class AufraumSpiel {
         document.getElementById('total-items').textContent = this.totalItems;
     }
 
+    // Selektiere ein Item (Mobile Click-to-Select)
+    selectItem(itemElement) {
+        // Deselect previous
+        if (this.selectedItem && this.selectedItem !== itemElement) {
+            this.deselectItem();
+        }
+
+        this.selectedItem = itemElement;
+        itemElement.classList.add('selected');
+        itemElement.style.boxShadow = '0 6px 18px rgba(0,0,0,0.35)';
+        itemElement.style.transform = 'translate(-50%, -50%) scale(1.05)';
+
+        // If mobile, show a short instruction for where to tap
+        if (this.isMobile) {
+            const inst = document.getElementById('mobile-instruction') || document.createElement('div');
+            inst.id = 'mobile-instruction';
+            inst.style.position = 'fixed';
+            inst.style.bottom = '18px';
+            inst.style.left = '50%';
+            inst.style.transform = 'translateX(-50%)';
+            inst.style.background = 'rgba(0,0,0,0.75)';
+            inst.style.color = 'white';
+            inst.style.padding = '10px 14px';
+            inst.style.borderRadius = '8px';
+            inst.style.zIndex = '3000';
+            inst.textContent = 'Tippe das Ziel an, um das ausgewählte Objekt zu platzieren.';
+            document.body.appendChild(inst);
+        }
+    }
+
+    // Deselektiere das aktuell selektierte Item
+    deselectItem() {
+        if (!this.selectedItem) return;
+        try {
+            this.selectedItem.classList.remove('selected');
+            this.selectedItem.style.boxShadow = '';
+            this.selectedItem.style.transform = 'translate(-50%, -50%)';
+        } catch (e) {
+            // ignore
+        }
+        this.selectedItem = null;
+
+        const inst = document.getElementById('mobile-instruction');
+        if (inst && inst.parentNode) inst.parentNode.removeChild(inst);
+    }
+
     roomCompleted() {
         this.score += 100;
         this.updateDisplay();
@@ -997,6 +951,21 @@ class AufraumSpiel {
         }
     }
 
+    // Detect if running on a mobile / touch-capable device
+    detectMobile() {
+        try {
+            if (typeof navigator !== 'undefined') {
+                const ua = navigator.userAgent || '';
+                const touch = (typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
+                const mobileUa = /Mobi|Android|iPhone|iPad|iPod|IEMobile|BlackBerry|Opera Mini/i.test(ua);
+                return touch || mobileUa;
+            }
+        } catch (e) {
+            // If anything goes wrong, assume desktop
+        }
+        return false;
+    }
+
     getLevelItems(roomKey) {
         const baseItems = this.roomData[roomKey].items;
 
@@ -1019,6 +988,17 @@ class AufraumSpiel {
             default:
                 return baseItems;
         }
+    }
+
+    // Liefert den Lokaliserten Level-Namen
+    getLevelName() {
+        const names = {
+            0: '🟢 Einfach',
+            1: '🟡 Normal',
+            2: '🟠 Schwer',
+            3: '🔴 Experte'
+        };
+        return names[this.currentLevel] || `Level ${this.currentLevel}`;
     }
 
     getHardLevelItems(baseItems) {
